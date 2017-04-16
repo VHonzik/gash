@@ -41,6 +41,11 @@ namespace Gash.Output
             CurrentLineTimer = 0.0f;
         }
 
+        private void FinishedTyping()
+        {
+            GConsole.Instance.Input.ReadyForInput();
+        }
+
         private void LineQueueProcessColor()
         {
             ConsoleColor foregroundColor = (ConsoleColor)Convert.ToInt32(CurrentLine.Line.Substring(CurrentLine.LineIndex + 1, 2));
@@ -178,6 +183,8 @@ namespace Gash.Output
             CurrentLine = PreviousLine;
             LineQueueEndOfSameLine();
             ConsoleAccess.Unlock();
+
+            FinishedTyping();
         }
 
         public void Update(float deltaTime)
@@ -209,6 +216,7 @@ namespace Gash.Output
                 ConsoleAccess.Lock();
                 LineQueueEndOfLine();
                 ConsoleAccess.Unlock();
+                FinishedTyping();
             }
         }
     }

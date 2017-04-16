@@ -26,5 +26,15 @@ namespace Gash
         /// The dots cycle 1 - 2 - 3 - 0 - 1 - 2 - 3 etc.
         /// </summary>
         public bool SameLinesProduceDots = false;
+
+        /// <summary>
+        /// Default foreground color for highliting commands and keywords in text.
+        /// </summary>
+        public ConsoleColor CommandsAndKeywordsHighlightColorForeground = ConsoleColor.Cyan;
+
+        /// <summary>
+        /// Default background color for highliting commands and keywords in text.
+        /// </summary>
+        public ConsoleColor CommandsAndKeywordsHighlightColorBackground = ConsoleColor.Black;
     }
 }

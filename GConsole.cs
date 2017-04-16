@@ -1,30 +1,35 @@
 ﻿using System;
 using System.Threading;
-using Gash.Output;
 using System.Threading.Tasks;
+using Gash.Output;
 using Gash.Input;
+using Gash.Commands;
 
 namespace Gash
 {
     /// <summary>
     /// Main entry point - singleton - of Gash library. 
     /// It's a glorified singleton wrapper around .NET Console.
-    /// Your application should:
-    ///     1. Initialize, such as register commands, using GConsole.Instance
-    ///     2. Call GConsole.Instance.Start method
     /// </summary>
     public class GConsole
     {
         private GameLoop Loop = new GameLoop();
         internal OutputManager Output = new OutputManager();
-        internal InputManager Input = new InputManager();
+        internal InputManager Input = new InputManager();        
 
-        private static GConsole OneAndOnly;
-
+        /// <summary>
+        /// Gash settings
+        /// </summary>
         public Settings Settings = new Settings();
+
+        /// <summary>
+        /// Commands list used to register commands.
+        /// </summary>
+        public CommandList Commands = new CommandList();
 
         internal Mutex ConsoleLock = new Mutex();
 
+        private static GConsole TheOneAndOnly;
         /// <summary>
         /// Singleton accessor
         /// </summary>
@@ -32,12 +37,12 @@ namespace Gash
         {
             get
             {
-                if (OneAndOnly == null)
+                if (TheOneAndOnly == null)
                 {
-                    OneAndOnly = new GConsole();
+                    TheOneAndOnly = new GConsole();
                 }
 
-                return OneAndOnly;
+                return TheOneAndOnly;
             }
         }
 
@@ -46,6 +51,10 @@ namespace Gash
             Loop.SubscribeLooped(Output);
         }
 
+        /// <summary>
+        /// Subscribe to the game loop.
+        /// </summary>
+        /// <param name="looped">An object implementing IGameLooped interface.</param>
         public void SubscribeLooped(IGameLooped looped)
         {
             Loop.SubscribeLooped(looped);
@@ -63,6 +72,7 @@ namespace Gash
         /// </summary>
         public void Start()
         {
+            Commands.RegisterCommand(new Man());
             Input.Start();
             Output.Start();
             Task inputThread = Task.Factory.StartNew(Input.StartThread, CancellationToken.None,
@@ -84,7 +94,7 @@ namespace Gash
         /// </summary>
         /// <param name="format">Composite format string of line to type. Same syntax as String.Format.</param>
         /// <param name="arg0">The object to format.</param>
-        public void WriteLine(string format, object arg0) { Instance.Output.WriteLine(String.Format(format, arg0)); }
+        public static void WriteLine(string format, object arg0) { Instance.Output.WriteLine(String.Format(format, arg0)); }
 
         /// <summary>
         /// Type a formatted line to a console with default speed.
@@ -93,5 +103,32 @@ namespace Gash
         /// <param name="args">An object array that contains zero or more objects to format.</param>
         public static void WriteLine(string format, params object[] args)
         { Instance.Output.WriteLine(String.Format(format, args)); }
+
+        /// <summary>
+        /// Returns markdown for text colored as passed, which Gash framework understands when used in WriteLine.
+        /// </summary>
+        /// <param name="foreground">Foreground, i.e. font color, of the text.</param>
+        /// <param name="background">Background color of the text.</param>
+        /// <param name="text">Text to make colored.</param>
+        /// <returns></returns>
+        public static string ColorifyText(ConsoleColor foreground, ConsoleColor background, string text)
+        {
+            return String.Format("${0}{1}{2}$", 
+                ((int)foreground).ToString("D2"), 
+                ((int)background).ToString("D2"), 
+                text);
+        }
+
+        /// <summary>
+        /// Highlights a text using "Settings.CommandsAndKeywordsHighlightColor"s
+        /// </summary>
+        /// <param name="text">Text to highlight.</param>
+        /// <returns></returns>
+        public static string HighlightTextAsCommandOrKeyword(string text)
+        {
+            return ColorifyText(Instance.Settings.CommandsAndKeywordsHighlightColorForeground,
+                Instance.Settings.CommandsAndKeywordsHighlightColorBackground,
+                text);
+        }
     }
 }

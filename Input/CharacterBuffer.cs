@@ -72,6 +72,12 @@ namespace Gash.Input
             Buffer.Clear();
         }
 
+        public void ReadyForInput()
+        {
+            ConsoleAccess.Lock();
+            ConsoleAccess.Unlock();
+        }
+
         public void OverwriteCurrentLine(string line)
         {
             ConsoleAccess.Lock();
