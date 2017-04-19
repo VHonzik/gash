@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Gash.Commands;
 using System.Text;
 
 namespace Gash.Input
@@ -8,6 +9,7 @@ namespace Gash.Input
     {
         private CharacterBuffer Buffer = new CharacterBuffer();
         private CommandHistory History = new CommandHistory();
+        private AutoComplete AutoComplete = new AutoComplete();
 
         public void StartThread()
         {
@@ -22,7 +24,15 @@ namespace Gash.Input
                 {
                     key = Console.ReadKey(true);
 
-                    if (History.ProcessInput(key))
+                    if (AutoComplete.ProcessInput(key))
+                    {
+                        var result = AutoComplete.TryComplete(Buffer.Characters);
+                        if (result.WasSuccessful == AutoCompletionResultType.SuccessOneOption)
+                        {
+                            Buffer.OverwriteCurrentLine(result.Results[0]);
+                        }
+                    }
+                    else if (History.ProcessInput(key))
                     {
                         if (History.Used == false)
                         {
@@ -45,7 +55,7 @@ namespace Gash.Input
                 } while (key.Key != ConsoleKey.Enter);
 
                 string command = Buffer.Characters;
-                Buffer.ClearCurrentLine();
+                Buffer.ClearLine(Buffer.InputYPos);
                 if (History.Used == true) History.ClearUsedCommand();
                 History.AddCommand(command);
                 GConsole.Instance.Commands.ParseLine(command);

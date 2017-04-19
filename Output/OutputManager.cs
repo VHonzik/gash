@@ -140,6 +140,7 @@ namespace Gash.Output
             }
 
             LineQueueEndOfLine();
+            ConsoleAccess.Unlock();
 
             if (LineQueue.Count > 0)
             {
@@ -149,7 +150,10 @@ namespace Gash.Output
                     InstantLine();
                 }
             }
-            ConsoleAccess.Unlock();
+            else
+            {
+                FinishedTyping();
+            }
         }
 
         private void SameLineDot()
@@ -201,6 +205,11 @@ namespace Gash.Output
             }
             else if (CurrentLine != null && CurrentLine.LineIndex < CurrentLine.Line.Length)
             {
+                if(CurrentLine.ConsolePos != null && CurrentLine.ConsolePos[1] == Console.WindowTop + Console.WindowHeight - 2)
+                {
+                    Console.SetWindowPosition(Console.WindowLeft, Console.WindowTop + 1);
+                }
+
                 if (CurrentLine.Speed <= 0.0f)
                 {
                     InstantLine();

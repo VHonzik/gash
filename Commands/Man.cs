@@ -57,17 +57,17 @@ namespace Gash.Commands
 
         public void PrintManPage()
         {
-            GConsole.WriteLine(Resources.text.ManHeaderName);
-            GConsole.WriteLine("\t{0}", GConsole.HighlightTextAsCommandOrKeyword(Name()));
+            GConsole.WriteLine(-1.0f, Resources.text.ManHeaderName);
+            GConsole.WriteLine(-1.0f, "\t{0}", GConsole.HighlightTextAsCommandOrKeyword(Name()));
             GConsole.WriteLine(Resources.text.ManHeaderSynopsis);
-            GConsole.WriteLine("\t{0} {1}", 
+            GConsole.WriteLine(-1.0f, "\t{0} {1}",
                 GConsole.HighlightTextAsCommandOrKeyword(Name()),
                 GConsole.ColorifyText(ConsoleColor.Black, ConsoleColor.Red,"command"));
-            GConsole.WriteLine(Resources.text.ManHeaderDescription);
+            GConsole.WriteLine(-1.0f, Resources.text.ManHeaderDescription);
 
             foreach(var line in Resources.text.ManMan.Split(new string[] { Environment.NewLine }, StringSplitOptions.None))
             {
-                GConsole.WriteLine(line);
+                GConsole.WriteLine(-1.0f, line);
             }
         }
     }

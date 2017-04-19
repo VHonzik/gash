@@ -12,7 +12,9 @@ namespace Gash.Input
 
         private ConsoleAccess ConsoleAccess = null;
 
-        private int InputYPos
+        private int PreviousInputYPos = Console.WindowTop + Console.WindowHeight - 1;
+
+        public int InputYPos
         {
             get => Console.WindowTop + Console.WindowHeight - 1;
         }
@@ -74,14 +76,27 @@ namespace Gash.Input
 
         public void ReadyForInput()
         {
-            ConsoleAccess.Lock();
-            ConsoleAccess.Unlock();
+            if(InputYPos != PreviousInputYPos)
+            {
+                ConsoleAccess.Lock();
+
+                ConsoleAccess.SetCursorPosition(0, InputYPos);
+                Console.Write(Characters);
+
+                PreviousInputYPos = InputYPos;
+                ConsoleAccess.Unlock();
+            }
+            else
+            {
+                ConsoleAccess.Lock();
+                ConsoleAccess.Unlock();
+            }
         }
 
         public void OverwriteCurrentLine(string line)
         {
             ConsoleAccess.Lock();
-            ClearCurrentLine();
+            ClearLine(InputYPos);
             Buffer = new List<char>(line.ToArray());
             CursorPosition = Buffer.Count;
             Console.Write(Characters);
@@ -104,18 +119,18 @@ namespace Gash.Input
         public void PostprocessApply()
         {
             ConsoleAccess.Lock();
-            ClearCurrentLine();
+            ClearLine(InputYPos);
             ConsoleAccess.Write(Characters);
             ConsoleAccess.SetCursorPosition(CursorPosition, InputYPos);
             ConsoleAccess.Unlock();
         }
 
-        public void ClearCurrentLine()
+        public void ClearLine(int yPos)
         {
             int width = Console.CursorLeft + 1;
-            ConsoleAccess.SetCursorPosition(0, InputYPos);
+            ConsoleAccess.SetCursorPosition(0, yPos);
             Console.Write(new String(' ', width));
-            ConsoleAccess.SetCursorPosition(0, InputYPos);
+            ConsoleAccess.SetCursorPosition(0, yPos);
         }
 
         public string Characters

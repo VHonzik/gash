@@ -70,7 +70,7 @@ namespace Gash
         /// Several threads will be spawned and game loop will start.
         /// This will block the calling thread.
         /// </summary>
-        public void Start()
+        public void StartConsole()
         {
             Commands.RegisterCommand(new Man());
             Input.Start();
@@ -84,17 +84,25 @@ namespace Gash
         }
 
         /// <summary>
+        /// Short-hand for GConsole.Instance.Start.
+        /// </summary>
+        public static void Start()
+        {
+            Instance.StartConsole();
+        }
+
+        /// <summary>
         /// Type a line to a console with default speed.
         /// </summary>
         /// <param name="line">Line to write to the console.</param>
         public static void WriteLine(string line) { Instance.Output.WriteLine(line); }
 
         /// <summary>
-        /// Type a formatted line to a console with default speed.
+        /// Type a line to a console.
         /// </summary>
-        /// <param name="format">Composite format string of line to type. Same syntax as String.Format.</param>
-        /// <param name="arg0">The object to format.</param>
-        public static void WriteLine(string format, object arg0) { Instance.Output.WriteLine(String.Format(format, arg0)); }
+        /// <param name="speed">Number of seconds per character. Negative number types the line instantly.</param>
+        /// <param name="line">Line to write to the console.</param>
+        public static void WriteLine(float speed, string line) { Instance.Output.WriteLine(line, speed); }
 
         /// <summary>
         /// Type a formatted line to a console with default speed.
@@ -103,6 +111,15 @@ namespace Gash
         /// <param name="args">An object array that contains zero or more objects to format.</param>
         public static void WriteLine(string format, params object[] args)
         { Instance.Output.WriteLine(String.Format(format, args)); }
+
+        /// <summary>
+        /// Type a formatted line to a console.
+        /// </summary>
+        /// <param name="speed">Number of seconds per character. Negative number types the line instantly.</param>
+        /// <param name="format">Composite format string of line to type. Same syntax as String.Format.</param>
+        /// <param name="args">An object array that contains zero or more objects to format.</param>
+        public static void WriteLine(float speed, string format, params object[] args)
+        { Instance.Output.WriteLine(String.Format(format, args), speed); }
 
         /// <summary>
         /// Returns markdown for text colored as passed, which Gash framework understands when used in WriteLine.
