@@ -13,8 +13,8 @@ It is C# class library targeting .NET Standard 1.6 and therefore compatible with
   - Built-in "list available commands" command
 - Tab auto-complete for commands and keywords
 - Separated input and output
-  - In both console location and thread sense
-  - Input is the very last line of the window (inspired by Vim)
+  - Only one of those can use the underlying console at a time
+  - Input line is not overwritten by output but rather moved down
 - Fixed-time game loop
 - Unix shell style command history (up/down arrows)
 
@@ -30,16 +30,19 @@ It is C# class library targeting .NET Standard 1.6 and therefore compatible with
 </ItemGroup>
 ````
 3. Perform any desired starting procedures including but not limited to:
-    1. Register commands via `GConsole.Commands.RegisterCommand`
-    2. Subcribe game logic instances to the game loop via `GConsole.Instance.SubscribeLooped`
-    3. Change settings via `GConsole.Instance.Settings`
-4. Start the *gash* framework through `GConsole` singleton:
+    1. Register commands via `GConsole.RegisterCommand`
+    2. Subcribe game logic instances to the game loop via `GConsole.SubscribeLooped`
+    3. Change settings via `GConsole.Settings`
+    
+Note that the first call to GConsole will initialize the framework but does not start it, see below.
+
+4. Start the *gash* framework through `GConsole`:
 ```C#
-Gash.GConsole.Instance.Start();
+GConsole.Start();
 ````
 Note that this will block the calling thread and therefore suited to be used in `Main` function. This will also start the game loop.
 
-5. Anytime during your game execution you can use *GConsole* static *WriteLine* methods to write to the console
+5. Anytime during your game execution you can use `GConsole` static `WriteLine` methods to write to the console
 
 ## Futher reading
 
