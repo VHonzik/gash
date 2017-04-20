@@ -7,7 +7,7 @@ namespace Gash.Input
 {
     internal class InputManager
     {
-        private CharacterBuffer Buffer = new CharacterBuffer();
+        internal CharacterBuffer Buffer = new CharacterBuffer();
         private CommandHistory History = new CommandHistory();
         private AutoComplete AutoComplete = new AutoComplete();
 
@@ -68,9 +68,9 @@ namespace Gash.Input
             Buffer.Start();            
         }
 
-        public void ReadyForInput()
+        public void ClearCurrentLine()
         {
-            Buffer.ReadyForInput();
+            Buffer.ClearLine(Buffer.InputYPos);
         }
     }
 }

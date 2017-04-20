@@ -16,7 +16,14 @@ namespace Gash.Output
 
         private ConsoleAccess ConsoleAccess { get; set; }
 
-        private int WantedConsolePosY = 0;
+        public int[] ConsolePosition
+        {
+            get
+            {
+                if (ConsoleAccess != null) return ConsoleAccess.ConsolePosition;
+                return new int[2] { 0, 0 };
+            }
+        }
 
         public void WriteLine(string line)
         {
@@ -39,11 +46,6 @@ namespace Gash.Output
             CurrentLine.LineIndex = 0;
             CurrentLine.RealCharLineIndex = 0;
             CurrentLineTimer = 0.0f;
-        }
-
-        private void FinishedTyping()
-        {
-            GConsole.Instance.Input.ReadyForInput();
         }
 
         private void LineQueueProcessColor()
@@ -89,7 +91,6 @@ namespace Gash.Output
         {
             LineQueueEndOfSameLine();
             ConsoleAccess.Write("\n");
-            WantedConsolePosY += 1;
         }
 
         private void TimedLine()
@@ -115,6 +116,11 @@ namespace Gash.Output
                 }
             }
             ConsoleAccess.Unlock();
+        }
+
+        private void FinishedTyping()
+        {
+            GConsole.Instance.Input.Buffer.PostprocessApply();
         }
 
         private void InstantLine()
@@ -196,6 +202,8 @@ namespace Gash.Output
             if (CurrentLine == null && LineQueue.Count > 0)
             {
                 LineQueuePop();
+
+                GConsole.Instance.Input.ClearCurrentLine();
 
                 if (PreviousLine != null && PreviousLine.Line == CurrentLine.Line &&
                     GConsole.Instance.Settings.SameLinesProduceDots == true)

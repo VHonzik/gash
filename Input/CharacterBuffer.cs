@@ -12,11 +12,9 @@ namespace Gash.Input
 
         private ConsoleAccess ConsoleAccess = null;
 
-        private int PreviousInputYPos = Console.WindowTop + Console.WindowHeight - 1;
-
         public int InputYPos
         {
-            get => Console.WindowTop + Console.WindowHeight - 1;
+            get => GConsole.Instance.Output.ConsolePosition[1];
         }
 
         public bool ProcessInput(ConsoleKeyInfo key)
@@ -52,6 +50,11 @@ namespace Gash.Input
                     }
                     else
                     {
+                        Buffer.Add(' ');
+                        for(int i=Buffer.Count-2;i>=CursorPosition;i--)
+                        {
+                            Buffer[i + 1] = Buffer[i]; 
+                        }
                         Buffer[CursorPosition] = key.KeyChar;
                     }
                     CursorPosition++;
@@ -72,25 +75,6 @@ namespace Gash.Input
         {
             CursorPosition = 0;
             Buffer.Clear();
-        }
-
-        public void ReadyForInput()
-        {
-            if(InputYPos != PreviousInputYPos)
-            {
-                ConsoleAccess.Lock();
-
-                ConsoleAccess.SetCursorPosition(0, InputYPos);
-                Console.Write(Characters);
-
-                PreviousInputYPos = InputYPos;
-                ConsoleAccess.Unlock();
-            }
-            else
-            {
-                ConsoleAccess.Lock();
-                ConsoleAccess.Unlock();
-            }
         }
 
         public void OverwriteCurrentLine(string line)
