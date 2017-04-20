@@ -43,7 +43,14 @@ Any text in {0} color can be passed as a parameter.
 The parameter accepts spaces and therefore it can be multiple words.",
                     GConsole.HighlightTextAsCommandOrKeyword("cyan"));
             }
-                
+
+            public static string ListCommandName = "list";
+            public static string ListMan
+            {
+                get => "Display list of currently available commands.";
+            }
+
+
         }
     }
 }

@@ -73,6 +73,7 @@ namespace Gash
         public void StartConsole()
         {
             Commands.RegisterCommand(new Man());
+            Commands.RegisterCommand(new List());
             Input.Start();
             Output.Start();
             Task inputThread = Task.Factory.StartNew(Input.StartThread, CancellationToken.None,
