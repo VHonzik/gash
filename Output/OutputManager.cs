@@ -27,7 +27,7 @@ namespace Gash.Output
 
         public void WriteLine(string line)
         {
-            LineQueue.Enqueue(new OutputLine() { Line = line, Speed = GConsole.Instance.Settings.TypingSpeed });
+            LineQueue.Enqueue(new OutputLine() { Line = line, Speed = GConsole.Settings.TypingSpeed });
         }
 
         public void WriteLine(string line, float speed)
@@ -206,7 +206,7 @@ namespace Gash.Output
                 GConsole.Instance.Input.ClearCurrentLine();
 
                 if (PreviousLine != null && PreviousLine.Line == CurrentLine.Line &&
-                    GConsole.Instance.Settings.SameLinesProduceDots == true)
+                    GConsole.Settings.SameLinesProduceDots == true)
                 {
                     SameLineDot();
                 }

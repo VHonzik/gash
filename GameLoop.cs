@@ -11,7 +11,7 @@ namespace Gash
     {
         private float SecondsPerFrame
         {
-            get => 1.0f / GConsole.Instance.Settings.FPS;
+            get => 1.0f / GConsole.Settings.FPS;
         }
         private float MilisecondsPerFrame
         {

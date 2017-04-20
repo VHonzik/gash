@@ -17,23 +17,15 @@ namespace Gash
         internal OutputManager Output = new OutputManager();
         internal InputManager Input = new InputManager();        
 
-        /// <summary>
-        /// Gash settings
-        /// </summary>
-        public Settings Settings = new Settings();
+        internal Settings TheSettings = new Settings();
 
-        /// <summary>
-        /// Commands list used to register commands.
-        /// </summary>
-        public CommandList Commands = new CommandList();
+        internal CommandList Commands = new CommandList();
 
         internal Mutex ConsoleLock = new Mutex();
 
         private static GConsole TheOneAndOnly;
-        /// <summary>
-        /// Singleton accessor
-        /// </summary>
-        public static GConsole Instance
+
+        internal static GConsole Instance
         {
             get
             {
@@ -52,12 +44,20 @@ namespace Gash
         }
 
         /// <summary>
+        /// Access and change the Gash framework settings.
+        /// </summary>
+        public static Settings Settings
+        {
+            get => Instance.TheSettings;
+        }
+
+        /// <summary>
         /// Subscribe to the game loop.
         /// </summary>
         /// <param name="looped">An object implementing IGameLooped interface.</param>
-        public void SubscribeLooped(IGameLooped looped)
+        public static void SubscribeLooped(IGameLooped looped)
         {
-            Loop.SubscribeLooped(looped);
+            Instance.Loop.SubscribeLooped(looped);
         }
 
         internal ConsoleAccess RequestAccess()
@@ -90,6 +90,16 @@ namespace Gash
         public static void Start()
         {
             Instance.StartConsole();
+        }
+
+        /// <summary>
+        /// Register a new command to a list of know commands.
+        /// Not registerd commands are invisible to the Gash framework.
+        /// </summary>
+        /// <param name="command">An object implementing ICommand interface.</param>
+        public static void RegisterCommand(ICommand command)
+        {
+            Instance.Commands.RegisterCommand(command);
         }
 
         /// <summary>
@@ -144,8 +154,8 @@ namespace Gash
         /// <returns></returns>
         public static string HighlightTextAsCommandOrKeyword(string text)
         {
-            return ColorifyText(Instance.Settings.CommandsAndKeywordsHighlightColorForeground,
-                Instance.Settings.CommandsAndKeywordsHighlightColorBackground,
+            return ColorifyText(Instance.TheSettings.CommandsAndKeywordsHighlightColorForeground,
+                Instance.TheSettings.CommandsAndKeywordsHighlightColorBackground,
                 text);
         }
     }
