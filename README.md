@@ -31,8 +31,9 @@ It is C# class library targeting .NET Standard 1.6 and therefore compatible with
 ````
 3. Perform any desired starting procedures including but not limited to:
     1. Register commands via `GConsole.RegisterCommand`
-    2. Subcribe game logic instances to the game loop via `GConsole.SubscribeLooped`
-    3. Change settings via `GConsole.Settings`
+    2. Register keywords via `GConsole.RegisterKeyword`
+    3. Subcribe game logic instances to the game loop via `GConsole.SubscribeLooped`
+    4. Change settings via `GConsole.Settings` and text resources via `Resources.text`
     
 Note that the first call to GConsole will initialize the framework but does not start it, see below.
 
@@ -40,9 +41,13 @@ Note that the first call to GConsole will initialize the framework but does not 
 ```C#
 GConsole.Start();
 ````
-Note that this will block the calling thread and therefore suited to be used in `Main` function. This will also start the game loop.
+Note that this will block the calling thread and is therefore suited to be used in `Main` function. This will also start the game loop.
 
 5. Anytime during your game execution you can use `GConsole` static `WriteLine` methods to write to the console
+6. Once your game has finished exit the Gash framework:
+```C#
+GConsole.Exit();
+```
 
 ## Futher reading
 
@@ -50,8 +55,10 @@ TODO
 
 ## Contributing
 
-TODO
+All kinds of contributions are welcomed. Bug reports, feature requests, documentation suggestions all go to [Github Issues page](https://github.com/VHonzik/gash/issues). As for a format, inspire yourself by already existing tickets there. For larger efforts, either look at [open Issues](https://github.com/VHonzik/gash/issues) or [contact me](https://github.com/VHonzik) directly.
 
 ## History
+- April 2017 - The 1.0.0 of Gash was released
+- April 2017 - Alpha version of Gash was used in my [LD 38 entry](https://ldjam.com/events/ludum-dare/38/small-world-of-underbury)
+- February 2017 - What would become a Gash library is in heavy development for a game project 
 
-TODO
