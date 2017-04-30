@@ -2,29 +2,24 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace Gash.Commands
 {
+    /// <summary>
+    /// Collection of static helper functions for parsing and auto-completing.
+    /// </summary>
     public class ParsingHelpers
     {
-        private static Parser<IEnumerable<string>> ShortFlagMult = 
+        private static Parser<string> ShortFlag = 
             from trailing in Parse.WhiteSpace.AtLeastOnce()
             from hyphen in Parse.Char('-')
             from flags in Parse.Letter.Many()
-            select flags.Select(x => x.ToString().ToLower());
+            select String.Concat(flags.Select(x => x.ToString().ToLower()));
 
-        private static Parser<IEnumerable<string>> LongFlag = 
-            from trailing in Parse.WhiteSpace.AtLeastOnce()
-            from hyphens in Parse.Char('-').Repeat(2)
-            from flag in Parse.LetterOrDigit.Many()
-            select new string[1] { new string(flag.ToArray()).ToLower() };
 
-        private static Parser<IEnumerable<string>> ShortOrLongFlag = LongFlag.Or(ShortFlagMult);
+        private static Parser<IEnumerable<string>> ShortFlagMultMulti = ShortFlag.Many();
 
-        private static Parser<IEnumerable<string>> Flags = 
-            from flags in ShortOrLongFlag.Many()
-            select flags.SelectMany(x => x);
+        private static Parser<IEnumerable<string>> Flags = ShortFlagMultMulti;
 
         private static Parser<string> AnyCommandBody = 
             from trailing in Parse.WhiteSpace.Many()
@@ -127,7 +122,7 @@ namespace Gash.Commands
             if (result.Type == ParsingResultType.SuccessReachedEnd)
             {
                 result.Type = ParsingResultType.MissingParam;
-                GConsole.WriteLine(Resources.text.MissingParam, command.Name());
+                GConsole.WriteLine(-1.0f, Resources.text.MissingParam, command.Name());
                 return result;
             }
 
@@ -145,6 +140,90 @@ namespace Gash.Commands
             }
 
             parameter = paramResult.Value;
+            result.Type = ParsingResultType.Success;
+            return result;
+        }
+
+        /// <summary>
+        /// Parse a command with parameters and flags.
+        /// </summary>
+        /// <param name="line">Input line.</param>
+        /// <param name="command">Command to parse.</param>
+        /// <param name="hasRequiredParams">Whether the command has at least on required parameters.</param>
+        /// <returns>Result of the parsing.
+        /// Possible result types are Success, WrongCommand, MissingParam and ParsingFailure.
+        /// It splits all the parameters by space into ParsingResult.Parameters.
+        /// See ParsingResult.</returns>
+        public static ParsingResult ParseCommand(string line, ICommand command, bool hasRequiredParams)
+        {
+            string remainder = "";
+
+            var result = ParseSimpleCommandBody(line, command, out remainder);
+
+            if (result.Type == ParsingResultType.SuccessReachedEnd)
+            {
+                if(hasRequiredParams == true)
+                {
+                    result.Type = ParsingResultType.MissingParam;
+                    GConsole.WriteLine(-1.0f, Resources.text.MissingParam, command.Name());
+                    return result;
+                }
+                else
+                {
+                    result.Type = ParsingResultType.Success;
+                    return result;
+                }
+            }
+
+            if (result.Type != ParsingResultType.Success)
+            {
+                return result;
+            }
+
+            var paramResult = TryTextParam(remainder);
+            if (paramResult.WasSuccessful == false && hasRequiredParams == true)
+            {
+                GConsole.WriteLine(Resources.text.FailureParsingRequiredParam, command.Name());
+                result.Type = ParsingResultType.ParsingFailure;
+                return result;
+            }
+
+            string parameters = paramResult.Value.TrimEnd();            
+            result.Parameters = parameters.Split(new char[] { ' ', '\t' }).ToList();
+
+            if(paramResult.Remainder.AtEnd == true)
+            {
+                result.Type = ParsingResultType.Success;
+                return result;
+            }
+
+            remainder = remainder.Substring(paramResult.Remainder.Position - 1).TrimEnd();
+
+            var flagsResult = ParsingHelpers.TryFlags(remainder);
+            if (flagsResult.WasSuccessful == false || flagsResult.Remainder.AtEnd == false)
+            {
+                GConsole.WriteLine(Resources.text.FailureParsingFlags, remainder, command.Name());
+                result.Type = ParsingResultType.ParsingFailure;
+                return result;
+            }
+
+            var parsedFlags = flagsResult.Value.ToList();
+
+            foreach (var flag in command.GetFlags())
+            {
+                if (flag.FindInList(ref parsedFlags))
+                {
+                    result.Flags.Add(flag);
+                }
+            }
+
+            if (parsedFlags.Count > 0)
+            {
+                GConsole.WriteLine(Resources.text.UnknownFlags, String.Join(",", parsedFlags), command.Name());
+                result.Type = ParsingResultType.ParsingFailure;
+                return result;
+            }
+
             result.Type = ParsingResultType.Success;
             return result;
         }
@@ -210,20 +289,26 @@ namespace Gash.Commands
         /// <param name="input">Input to auto-complete.</param>
         /// <param name="strings">List of potential auto-complete targets.</param>
         /// <returns>Result of the auto-complete. See AutoCompletionResult.</returns>
-        public static AutoCompletionResult AutoCompleteStringList(string input, List<string> strings)
+        public static AutoCompletionResult AutoCompleteStringList(string input, List<string> strings, bool allowSpaces = false)
         {
             AutoCompletionResult result = new AutoCompletionResult();
-            var parsingResult = TryAnyCommandBody(input);
+            var parsingResult = allowSpaces ? TryTextParam(input) : TryAnyCommandBody(input);
             if (parsingResult.WasSuccessful && parsingResult.Value.Length > 0)
             {
                 string stringStub = parsingResult.Value;
+                if(allowSpaces) stringStub = stringStub.Replace(" ", "");
+                if (allowSpaces) stringStub = stringStub.Replace("\t", "");
                 foreach (var s in strings)
                 {
-                    if (s == stringStub)
+                    string ss = s;
+                    if (allowSpaces) ss = ss.Replace(" ", "");
+                    if (allowSpaces) ss = ss.Replace("\t", "");
+                    if (ss == stringStub)
                     {
                         result.WasSuccessful = AutoCompletionResultType.FailureAlreadyComplete;
+                        result.RemainderStartPosition = parsingResult.Remainder.Position;
                     }
-                    else if (s.StartsWith(stringStub))
+                    else if (ss.StartsWith(stringStub))
                     {
                         result.WasSuccessful = AutoCompletionResultType.SuccessOneOption;
                         result.Results.Add(s);
@@ -234,6 +319,34 @@ namespace Gash.Commands
             if(result.Results.Count > 1)
             {
                 result.WasSuccessful = AutoCompletionResultType.SuccessMultipleOptions;
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Attemptes to auto-complete a string.
+        /// </summary>
+        /// <param name="input">Input to auto-complete.</param>
+        /// <param name="wantedString">Wanted target of the auto-complete.</param>
+        /// <returns>Result of the auto-complete. See AutoCompletionResult.</returns>
+        public static AutoCompletionResult AutoCompleteString(string input, string wantedString)
+        {
+            AutoCompletionResult result = new AutoCompletionResult();
+            var parsingResult = TryTextParam(input);
+            if (parsingResult.WasSuccessful && parsingResult.Value.Length > 0)
+            {
+                string stringStub = parsingResult.Value;
+                if (stringStub == wantedString)
+                {
+                    result.WasSuccessful = AutoCompletionResultType.FailureAlreadyComplete;
+                    result.RemainderStartPosition = parsingResult.Remainder.Position;
+                }
+                else if (wantedString.StartsWith(stringStub))
+                {
+                    result.WasSuccessful = AutoCompletionResultType.SuccessOneOption;
+                    result.Results.Add(wantedString);
+                }
             }
 
             return result;

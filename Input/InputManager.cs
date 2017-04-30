@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using Gash.Commands;
-using System.Text;
+﻿using Gash.Commands;
+using System;
 
 namespace Gash.Input
 {

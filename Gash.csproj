@@ -2,6 +2,11 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard1.6</TargetFramework>
+    <Authors>Vaclav Honzik</Authors>
+    <Description>A console game framework built in .NET Core.</Description>
+    <PackageProjectUrl>https://github.com/VHonzik/gash</PackageProjectUrl>
+    <PackageLicenseUrl>https://github.com/VHonzik/gash/blob/master/LICENSE</PackageLicenseUrl>
+    <RepositoryUrl>https://github.com/VHonzik/gash</RepositoryUrl>
   </PropertyGroup>
 
   <ItemGroup>

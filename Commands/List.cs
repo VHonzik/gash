@@ -1,10 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 
 namespace Gash.Commands
 {
-    class List : ICommand
+    internal class List : ICommand
     {
         private BoolFlag[] Flags = new BoolFlag[0];
 
@@ -34,12 +32,17 @@ namespace Gash.Commands
 
             if (result.Type == ParsingResultType.Success)
             {
+                GConsole.WriteLine(-1.0f, "{0} {1} {2}",
+                    GConsole.ColorifyText(1,"Currently available commands follow. You can use"),
+                    GConsole.ColorifyText(0,Resources.text.ManCommandName),
+                    GConsole.ColorifyText(1,"to learn more about them."));
+
                 foreach (var command in GConsole.Instance.Commands)
                 {
                     if (command.Available() == true)
                     {
                         GConsole.WriteLine(-1.0f, "\t{0}",
-                            GConsole.HighlightTextAsCommandOrKeyword(command.Name()));
+                            GConsole.ColorifyText(0,command.Name()));
                     }
                 }
             }
@@ -49,14 +52,18 @@ namespace Gash.Commands
 
         public void PrintManPage()
         {
-            GConsole.WriteLine(-1.0f, Resources.text.ManHeaderName);
-            GConsole.WriteLine(-1.0f, "\t{0}", GConsole.HighlightTextAsCommandOrKeyword(Name()));
-            GConsole.WriteLine(Resources.text.ManHeaderSynopsis);
+            GConsole.WriteLine(-1.0f, "{0} {1}",
+                GConsole.ColorifyText(1,Resources.text.ManHeaderIntro),
+                GConsole.ColorifyText(1,Name()));
+            GConsole.WriteLine(-1.0f, GConsole.ColorifyText(1,Resources.text.ManHeaderName));
+            GConsole.WriteLine(-1.0f, "\t{0}", GConsole.ColorifyText(0,Name()));
+            GConsole.WriteLine(-1.0f, GConsole.ColorifyText(1,Resources.text.ManHeaderSynopsis));
             GConsole.WriteLine(-1.0f, "\t{0}",
-                GConsole.HighlightTextAsCommandOrKeyword(Name()));
-            GConsole.WriteLine(-1.0f, Resources.text.ManHeaderDescription);
+                GConsole.ColorifyText(0,Name()));
+            GConsole.WriteLine(-1.0f, GConsole.ColorifyText(1,Resources.text.ManHeaderDescription));
 
-            GConsole.WriteLine(-1.0f, Resources.text.ListMan);
+            GConsole.WriteLine(-1.0f, GConsole.ColorifyText(1,Resources.text.ListMan));
+            GConsole.WriteLine(-1.0f, " ");
         }
     }
 }

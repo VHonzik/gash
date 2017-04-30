@@ -1,9 +1,6 @@
-﻿using System;
+﻿using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
 using System.Threading;
-using System.Xml.Linq;
-using System.Collections.Generic;
 
 namespace Gash
 {
@@ -21,7 +18,9 @@ namespace Gash
 
         private Stopwatch Timer = new Stopwatch();
 
-        private List<IGameLooped> Looped = new List<IGameLooped>(); 
+        private List<IGameLooped> Looped = new List<IGameLooped>();
+
+        public CancellationToken Token;
 
         public void SubscribeLooped(IGameLooped looped)
         {
@@ -40,7 +39,7 @@ namespace Gash
         {
             Timer.Start();
 
-            while (true)
+            while (Token.IsCancellationRequested == false)
             {
                 Timer.Restart();
 
@@ -48,7 +47,6 @@ namespace Gash
 
                 while (FrameTimerElapsed + Timer.ElapsedMilliseconds <= MilisecondsPerFrame) ;
                 FrameTimerElapsed = FrameTimerElapsed + Timer.ElapsedMilliseconds - MilisecondsPerFrame;
-
             }
         }
     }

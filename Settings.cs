@@ -1,9 +1,29 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace Gash
 {
+    /// <summary>
+    /// Type of a highlight.
+    /// </summary>
+    public class HighlightType
+    {
+        /// <summary>
+        /// Foreground color.
+        /// </summary>
+        public ConsoleColor Foreground;
+
+        /// <summary>
+        /// Background color.
+        /// </summary>
+        public ConsoleColor Background;
+
+        public HighlightType()
+        {
+            Foreground = ConsoleColor.Gray;
+            Foreground = ConsoleColor.Black;
+        }
+    }
     /// <summary>
     /// Settings class for Gash framework.
     /// </summary>
@@ -28,13 +48,16 @@ namespace Gash
         public bool SameLinesProduceDots = false;
 
         /// <summary>
-        /// Default foreground color for highliting commands and keywords in text.
+        /// List of highlight types used in GConsole.ColorifyText.
+        /// The first two elements are reserved:
+        ///     0 - commands highlight
+        ///     1 - non-game related Gash framework highlight (such as errors)
+        /// Add new highlights by adding to this list.
         /// </summary>
-        public ConsoleColor CommandsAndKeywordsHighlightColorForeground = ConsoleColor.Cyan;
-
-        /// <summary>
-        /// Default background color for highliting commands and keywords in text.
-        /// </summary>
-        public ConsoleColor CommandsAndKeywordsHighlightColorBackground = ConsoleColor.Black;
+        public List<HighlightType> Higlights = new List<HighlightType>()
+        {
+            new HighlightType() { Foreground=ConsoleColor.Cyan, Background=ConsoleColor.Black },
+            new HighlightType() { Foreground=ConsoleColor.DarkGray, Background=ConsoleColor.Black }
+        };
     }
 }

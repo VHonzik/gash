@@ -1,12 +1,11 @@
-﻿using System;
+﻿using Gash.Commands;
+using System;
 using System.Collections.Generic;
-using Gash.Commands;
 using System.Linq;
-using System.Text;
 
 namespace Gash.Input
 {
-    class AutoComplete
+    internal class AutoComplete
     {
         public bool ProcessInput(ConsoleKeyInfo key)
         {

@@ -1,9 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Text;
-using System.Threading;
-using System.Xml.Linq;
 
 namespace Gash.Output
 {
@@ -13,6 +9,8 @@ namespace Gash.Output
         private OutputLine CurrentLine;
         private OutputLine PreviousLine;
         private float CurrentLineTimer;
+
+        private bool Paused = false;
 
         private ConsoleAccess ConsoleAccess { get; set; }
 
@@ -27,17 +25,20 @@ namespace Gash.Output
 
         public void WriteLine(string line)
         {
-            LineQueue.Enqueue(new OutputLine() { Line = line, Speed = GConsole.Settings.TypingSpeed });
+            if(Paused == false)
+                LineQueue.Enqueue(new OutputLine() { Line = line, Speed = GConsole.Settings.TypingSpeed });
         }
 
         public void WriteLine(string line, float speed)
         {
-            LineQueue.Enqueue(new OutputLine() { Line = line, Speed = speed });
+            if (Paused == false)
+                LineQueue.Enqueue(new OutputLine() { Line = line, Speed = speed });
         }
 
         public void Wait(float time)
         {
-            LineQueue.Enqueue(new OutputLine() { Line = "", Speed = time });
+            if (Paused == false)
+                LineQueue.Enqueue(new OutputLine() { Line = "\0", Speed = time });
         }
 
         private void LineQueuePop()
@@ -235,6 +236,17 @@ namespace Gash.Output
                 ConsoleAccess.Unlock();
                 FinishedTyping();
             }
+
+        }
+
+        public void ClearQueuedOutput()
+        {
+            LineQueue.Clear();
+        }
+
+        public void PauseOutput(bool paused)
+        {
+            Paused = paused;
         }
     }
 }

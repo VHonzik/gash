@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Gash
+﻿namespace Gash
 {
     /// <summary>
     /// Interface for objects updated by the game loop.

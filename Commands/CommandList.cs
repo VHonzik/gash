@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Text;
 
 namespace Gash.Commands
 {
-    public class CommandList : IEnumerable<ICommand>
+    internal class CommandList : IEnumerable<ICommand>
     {
         private List<ICommand> KnownCommands = new List<ICommand>();
         private Dictionary<string, ICommand> KnownCommandsMap = new Dictionary<string, ICommand>();
@@ -39,21 +38,20 @@ namespace Gash.Commands
                     command = parsingResult.Value;
                 }
 
-                GConsole.WriteLine(String.Format(Resources.text.UnknownCommand, command));
+                GConsole.WriteLine(GConsole.ColorifyText(1,String.Format(Resources.text.UnknownCommand, command)));
             }
         }
 
-        internal void FindMan(string commandName)
+        internal bool FindMan(string commandName)
         {
             ICommand result = null;
             if (KnownCommandsMap.TryGetValue(commandName, out result))
             {
                 result.PrintManPage();
+                return true;
             }
-            else
-            {
-                GConsole.WriteLine(Resources.text.UnknownCommandForMan, commandName);
-            }
+
+            return false;
         }
 
         public IEnumerator<ICommand> GetEnumerator()

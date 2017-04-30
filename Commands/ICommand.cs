@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 
 namespace Gash.Commands
 {
@@ -40,7 +38,7 @@ namespace Gash.Commands
         IEnumerable<BoolFlag> GetFlags();
 
         /// <summary>
-        /// Triggered when player calls man command on this command.
+        /// Triggered when player calls a man command on this command.
         /// </summary>
         void PrintManPage();
 
