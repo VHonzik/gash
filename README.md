@@ -1,5 +1,7 @@
 # gash
 
+[![NuGet](https://img.shields.io/badge/nuget-1.0.0-blue.svg)](https://www.nuget.org/packages/Gash/)
+
 Acronym for game-again shell, punning on the pun of [Bash (Unix shell)](https://en.wikipedia.org/wiki/Bash_(Unix_shell)), *gash* is a framework for console games.
 It is C# class library targeting .NET Standard 1.6 and therefore compatible with [.NET Core 1.1](https://github.com/dotnet/core). Read cross-platform!
 
