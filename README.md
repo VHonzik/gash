@@ -53,7 +53,7 @@ GConsole.Exit();
 
 ## Futher reading
 
-TODO
+ - [Wiki here on Github](https://github.com/VHonzik/gash/wiki) should be your starting point for using *gash*.
 
 ## Contributing
 
