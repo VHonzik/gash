@@ -8,6 +8,7 @@ namespace Gash.Input
     {
         private List<char> Buffer = new List<char>();
         private int CursorPosition;
+        private int CurrentLineWidth;
 
         private ConsoleAccess ConsoleAccess = null;
 
@@ -22,10 +23,17 @@ namespace Gash.Input
             switch (key.Key)
             {
                 case ConsoleKey.Backspace:
-                    if (Buffer.Count > 0)
+                    if (CursorPosition > 0)
                     {
-                        Buffer.RemoveAt(Buffer.Count - 1);
+                        Buffer.RemoveAt(CursorPosition - 1);
                         CursorPosition--;
+                    }
+                    processed = true;
+                    break;
+                case ConsoleKey.Delete:
+                    if(CursorPosition < Buffer.Count)
+                    {
+                        Buffer.RemoveAt(CursorPosition);
                     }
                     processed = true;
                     break;
@@ -72,6 +80,7 @@ namespace Gash.Input
 
         public void StartLine()
         {
+            CurrentLineWidth = 0;
             CursorPosition = 0;
             Buffer.Clear();
         }
@@ -81,6 +90,7 @@ namespace Gash.Input
             ConsoleAccess.Lock();
             ClearLine(InputYPos);
             Buffer = new List<char>(line.ToArray());
+            CurrentLineWidth = Buffer.Count;
             CursorPosition = Buffer.Count;
             Console.Write(Characters);
             ConsoleAccess.Unlock();
@@ -104,15 +114,15 @@ namespace Gash.Input
             ConsoleAccess.Lock();
             ClearLine(InputYPos);
             ConsoleAccess.Write(Characters);
+            CurrentLineWidth = Characters.Length;
             ConsoleAccess.SetCursorPosition(CursorPosition, InputYPos);
             ConsoleAccess.Unlock();
         }
 
         public void ClearLine(int yPos)
         {
-            int width = Console.CursorLeft + 1;
             ConsoleAccess.SetCursorPosition(0, yPos);
-            Console.Write(new String(' ', width));
+            Console.Write(new String(' ', CurrentLineWidth));
             ConsoleAccess.SetCursorPosition(0, yPos);
         }
 
