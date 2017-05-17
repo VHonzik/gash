@@ -30,6 +30,13 @@ namespace Gash.Input
                     }
                     processed = true;
                     break;
+                case ConsoleKey.Delete:
+                    if(CursorPosition < Buffer.Count)
+                    {
+                        Buffer.RemoveAt(CursorPosition);
+                    }
+                    processed = true;
+                    break;
                 case ConsoleKey.LeftArrow:
                     if (CursorPosition > 0) CursorPosition--;
                     processed = true;
